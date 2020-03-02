@@ -7,6 +7,7 @@ module.exports = {
             jsx: true,
         },
     },
+    plugins: ['react'],
     extends: [
         'plugin:react/recommended',
         'plugin:@typescript-eslint/recommended',
@@ -19,9 +20,9 @@ module.exports = {
         },
     },
     rules: {
-        'one-var': ['warn', 'consecutive'],
         '@typescript-eslint/interface-name-prefix': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-use-before-define': 'off',
     },
 };
