@@ -1,18 +1,21 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { NewsModule } from './news/news.module';
 
 @Module({
     imports: [
-        MongooseModule.forRoot('mongodb://localhost/news_app', {
+        ConfigModule.forRoot({
+            envFilePath: '.env',
+        }),
+        MongooseModule.forRoot(process.env.DATABASE_HOST, {
+            dbName: process.env.DATABASE_NAME,
             useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: false
         }),
         NewsModule,
     ],
-    controllers: [AppController],
-    providers: [AppService],
 })
 export class AppModule {}
