@@ -5,16 +5,16 @@ export const NewsSchema = new Schema(
         text: String,
         tags: [String],
         imageUrl: String,
-        /* user_id: {
+        author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
-        }, */
+        },
     },
     {
         timestamps: {
-            createdAt: 'created_at',
-            updatedAt: 'updated_at',
+            createdAt: true,
+            updatedAt: true,
         },
         versionKey: false,
     },

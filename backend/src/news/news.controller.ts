@@ -8,17 +8,20 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
     HttpStatus,
-    NotFoundException,
 } from '@nestjs/common';
 import { Response } from 'express';
 
 import { NewsService } from './news.service';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { ValidateObjectId } from './shared/pipes/validate-object-id.pipe';
-import { ErrorMessages } from './shared/consts/error-messages.const';
+import { JwtAuthGuard } from 'src/auth/shared/guards/jwt-auth.guard';
+import { User } from 'src/users/interfaces/user.interface';
+import { GetUser } from 'src/auth/shared/decorators/get-user.decorator';
 
 @Controller('news')
+@UseGuards(JwtAuthGuard)
 export class NewsController {
     constructor(private readonly newsService: NewsService) {}
 
@@ -26,8 +29,14 @@ export class NewsController {
     async createPost(
         @Res() res: Response,
         @Body() createPostDTO: CreatePostDTO,
+        @GetUser() user: User,
     ) {
-        const createdPost = await this.newsService.createPost(createPostDTO);
+        const { id: author } = user;
+
+        const createdPost = await this.newsService.createPost(
+            createPostDTO,
+            author,
+        );
 
         return res.status(HttpStatus.CREATED).json(createdPost);
     }
@@ -39,13 +48,11 @@ export class NewsController {
     ) {
         const post = await this.newsService.getPostById(postId);
 
-        if (!post) throw new NotFoundException(ErrorMessages.NOT_FOUND);
-
         return res.status(HttpStatus.OK).json(post);
     }
 
     @Get('/posts')
-    async getPosts(@Res() res: Response, @Query('sort') sortQuery = '') {
+    async getPosts(@Res() res: Response, @Query('sort') sortQuery?: string) {
         const posts = await this.newsService.getPosts(sortQuery);
 
         return res.status(HttpStatus.OK).json(posts);
@@ -56,13 +63,15 @@ export class NewsController {
         @Res() res: Response,
         @Param('postId', new ValidateObjectId()) postId: string,
         @Body() createPostDTO: CreatePostDTO,
+        @GetUser() user: User,
     ) {
+        const { id: author } = user;
+
         const editedPost = await this.newsService.editPost(
             postId,
             createPostDTO,
+            author,
         );
-
-        if (!editedPost) throw new NotFoundException(ErrorMessages.NOT_FOUND);
 
         return res.status(HttpStatus.OK).json(editedPost);
     }
@@ -71,10 +80,11 @@ export class NewsController {
     async deletePost(
         @Res() res: Response,
         @Param('postId', new ValidateObjectId()) postId: string,
+        @GetUser() user: User,
     ) {
-        const deletedPost = await this.newsService.deletePost(postId);
+        const { id: author } = user;
 
-        if (!deletedPost) throw new NotFoundException(ErrorMessages.NOT_FOUND);
+        const deletedPost = await this.newsService.deletePost(postId, author);
 
         return res.status(HttpStatus.OK).json(deletedPost);
     }
