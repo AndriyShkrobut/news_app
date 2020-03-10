@@ -1,21 +1,31 @@
 import { Schema } from 'mongoose';
 
-export const UsersSchema = new Schema({
-    firstname: String,
-    lastname: String,
-    username: {
-        type: String,
-        unique: true,
-        required: true,
+export const UsersSchema = new Schema(
+    {
+        firstname: String,
+        lastname: String,
+        username: {
+            type: String,
+            unique: true,
+            required: true,
+        },
+        email: {
+            type: String,
+            unique: true,
+            required: true,
+            select: false,
+        },
+        salt: {
+            type: String,
+            select: false,
+        },
+        password: {
+            type: String,
+            required: true,
+            select: false,
+        },
     },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
+    {
+        versionKey: false,
     },
-    salt: String,
-    password: {
-        type: String,
-        required: true,
-    },
-});
+);

@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 
 import { Post } from './interfaces/post.interface';
 import { CreatePostDTO } from './dtos/create-post.dto';
-import { ErrorMessages } from './shared/consts/error-messages.const';
+import { ERROR_MESSAGES } from './shared/consts';
 
 @Injectable()
 export class NewsService {
@@ -20,9 +20,9 @@ export class NewsService {
     }
 
     async getPostById(postId: string): Promise<Post> {
-        const post = await this.postModel.findById(postId);
+        const post = await this.postModel.findById(postId).populate('author');
 
-        if (!post) throw new NotFoundException(ErrorMessages.NOT_FOUND);
+        if (!post) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
 
         return post;
     }
@@ -30,6 +30,7 @@ export class NewsService {
     async getPosts(sortQuery?: string): Promise<Post[]> {
         const posts = await this.postModel
             .find()
+            .populate('author')
             .sort(sortQuery)
             .exec();
 
@@ -50,7 +51,7 @@ export class NewsService {
             { new: true },
         );
 
-        if (!postToEdit) throw new NotFoundException(ErrorMessages.NOT_FOUND);
+        if (!postToEdit) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
 
         return postToEdit;
     }
@@ -61,7 +62,8 @@ export class NewsService {
             author,
         });
 
-        if (!postToDelete) throw new NotFoundException(ErrorMessages.NOT_FOUND);
+        if (!postToDelete)
+            throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
 
         return postToDelete;
     }

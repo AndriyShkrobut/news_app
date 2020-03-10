@@ -45,7 +45,7 @@ export class UsersService {
 
     async validateUser(signInUserDTO: SignInUserDTO): Promise<User> {
         const { password, ...data } = signInUserDTO;
-        const user = await this.getUser(data);
+        const user = await this.userModel.findOne(data).select('+password');
 
         if (!user || !(await compare(password, user.password))) {
             throw new UnauthorizedException('Invalid username or password');
