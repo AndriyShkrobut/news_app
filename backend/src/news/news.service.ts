@@ -37,6 +37,19 @@ export class NewsService {
         return posts;
     }
 
+    async getPostsByUserId(
+        userId: string,
+        sortQuery?: string,
+    ): Promise<Post[]> {
+        const posts = await this.postModel
+            .find({ author: userId})
+            .populate('author')
+            .sort(sortQuery)
+            .exec();
+
+        return posts;
+    }
+
     async editPost(
         postId: string,
         createPostDTO: CreatePostDTO,

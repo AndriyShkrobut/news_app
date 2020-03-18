@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { genSalt, hash, compare } from 'bcrypt';
+import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './interfaces/user.interface';
 import { UserDataDTO } from './dtos/user-data.dto';

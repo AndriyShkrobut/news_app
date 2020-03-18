@@ -58,6 +58,17 @@ export class NewsController {
         return res.status(HttpStatus.OK).json(posts);
     }
 
+    @Get('posts/users/:userId')
+    async getPostsByUser(
+        @Res() res: Response,
+        @Param('userId', new ValidateObjectId()) userId: string,
+        @Query('sort') sortQuery?: string,
+    ) {
+        const posts = await this.newsService.getPostsByUserId(userId);
+
+        return res.status(HttpStatus.OK).json(posts);
+    }
+
     @Put('/posts/:postId')
     async editPost(
         @Res() res: Response,
