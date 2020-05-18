@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { NewsModule } from './news/news.module';
-import { UsersModule } from './users/users.module';
+import { PostModule } from './post/post.module';
+import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { TokenModule } from './token/token.module';
 
 @Module({
     imports: [
@@ -18,9 +19,10 @@ import { AuthModule } from './auth/auth.module';
             useCreateIndex: true,
             useFindAndModify: false,
         }),
-        NewsModule,
-        UsersModule,
+        PostModule,
+        UserModule,
         AuthModule,
+        TokenModule,
     ],
 })
 export class AppModule {}

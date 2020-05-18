@@ -1,32 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/interfaces/user.interface';
-import { SignUpUserDTO } from 'src/users/dtos/sign-up-user.dto';
-import { SignInUserDTO } from 'src/users/dtos/sign-in-user.dto';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/interfaces/user.interface';
+import { SignUpUserDTO } from 'src/user/dtos/sign-up-user.dto';
+import { SignInUserDTO } from 'src/user/dtos/sign-in-user.dto';
+import { TokenService } from 'src/token/token.service';
+import { RefreshTokenDTO } from 'src/token/dtos/refresh-token.dto';
+import { AuthData } from './interfaces/auth-data.interface';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private readonly userService: UsersService,
-        private readonly jwtService: JwtService,
-    ) {}
+    constructor(private readonly _userService: UserService, private readonly _tokenService: TokenService) {}
 
     async signUp(signUpUserDTO: SignUpUserDTO): Promise<User> {
-        const userToCreate = await this.userService.createUser(signUpUserDTO);
+        const userToCreate = await this._userService.createUser(signUpUserDTO);
 
         return userToCreate;
     }
 
-    async signIn(signInUserDTO: SignInUserDTO): Promise<string> {
-        const user = await this.userService.validateUser(signInUserDTO);
+    async signIn(signInUserDTO: SignInUserDTO, userAgent: string): Promise<AuthData> {
+        const user = await this._userService.validateUser(signInUserDTO);
 
         const { username, id } = user;
 
-        const payload: JwtPayload = { username, id };
+        const accessToken = await this._tokenService.generateAccessToken({ id, username });
+        const refreshToken = await this._tokenService.generateRefreshToken({ id, userAgent });
 
-        return await this.jwtService.signAsync(payload);
+        return { accessToken, refreshToken };
+    }
+
+    async signOut(user: User, userAgent: string): Promise<boolean> {
+        const { _id: userId } = user;
+
+        return !!(await this._tokenService.deleteToken(userId, userAgent));
+    }
+
+    async refreshToken(refreshTokenDTO: RefreshTokenDTO): Promise<AuthData> {
+        const payload = await this._tokenService.validateRefreshToken(refreshTokenDTO);
+
+        if (!payload) {
+            throw new UnauthorizedException('Invalid token');
+        }
+
+        const { id, userAgent } = payload;
+
+        const { username } = await this._userService.getUserById(id);
+
+        await this._tokenService.deleteToken(id, userAgent);
+
+        const accessToken = await this._tokenService.generateAccessToken({ id, username });
+        const refreshToken = await this._tokenService.generateRefreshToken({ id, userAgent });
+
+        return { accessToken, refreshToken };
     }
 }

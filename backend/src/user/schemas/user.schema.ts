@@ -1,9 +1,10 @@
 import { Schema } from 'mongoose';
 
-export const UsersSchema = new Schema(
+export const UserSchema = new Schema(
     {
         firstname: String,
         lastname: String,
+        profileImagePath: String,
         username: {
             type: String,
             unique: true,
@@ -26,6 +27,9 @@ export const UsersSchema = new Schema(
         },
     },
     {
+        timestamps: {
+            createdAt: true,
+        },
         versionKey: false,
     },
 );

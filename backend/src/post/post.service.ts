@@ -3,32 +3,33 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Post } from './interfaces/post.interface';
+import { Comment } from './interfaces/comment.interface';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { ERROR_MESSAGES } from './shared/consts';
+import { CreateCommentDTO } from './dtos/create-comment.dto';
 
 @Injectable()
-export class NewsService {
-    constructor(@InjectModel('Post') private readonly postModel: Model<Post>) {}
+export class PostService {
+    constructor(@InjectModel('Post') private readonly _postModel: Model<Post>) {}
 
-    async createPost(
-        createPostDTO: CreatePostDTO,
-        author: string,
-    ): Promise<Post> {
-        const postToCreate = new this.postModel({ ...createPostDTO, author });
+    async createPost(createPostDTO: CreatePostDTO): Promise<Post> {
+        const postToCreate = new this._postModel(createPostDTO);
 
         return await postToCreate.save();
     }
 
     async getPostById(postId: string): Promise<Post> {
-        const post = await this.postModel.findById(postId).populate('author');
+        const post = await this._postModel.findById(postId).populate('author');
 
-        if (!post) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        if (!post) {
+            throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        }
 
         return post;
     }
 
     async getPosts(sortQuery?: string): Promise<Post[]> {
-        const posts = await this.postModel
+        const posts = await this._postModel
             .find()
             .populate('author')
             .sort(sortQuery)
@@ -37,12 +38,9 @@ export class NewsService {
         return posts;
     }
 
-    async getPostsByUserId(
-        userId: string,
-        sortQuery?: string,
-    ): Promise<Post[]> {
-        const posts = await this.postModel
-            .find({ author: userId})
+    async getPostsByUserId(userId: string, sortQuery?: string): Promise<Post[]> {
+        const posts = await this._postModel
+            .find({ author: userId })
             .populate('author')
             .sort(sortQuery)
             .exec();
@@ -50,12 +48,8 @@ export class NewsService {
         return posts;
     }
 
-    async editPost(
-        postId: string,
-        createPostDTO: CreatePostDTO,
-        author: string,
-    ): Promise<Post> {
-        const postToEdit = await this.postModel.findOneAndUpdate(
+    async editPost(postId: string, createPostDTO: CreatePostDTO, author: string): Promise<Post> {
+        const postToEdit = await this._postModel.findOneAndUpdate(
             {
                 _id: postId,
                 author,
@@ -64,19 +58,22 @@ export class NewsService {
             { new: true },
         );
 
-        if (!postToEdit) throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        if (!postToEdit) {
+            throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        }
 
         return postToEdit;
     }
 
     async deletePost(postId: string, author: string): Promise<Post> {
-        const postToDelete = await this.postModel.findOneAndDelete({
+        const postToDelete = await this._postModel.findOneAndDelete({
             _id: postId,
             author,
         });
 
-        if (!postToDelete)
+        if (!postToDelete) {
             throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
+        }
 
         return postToDelete;
     }

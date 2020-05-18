@@ -1,9 +1,4 @@
-import {
-    Injectable,
-    ConflictException,
-    InternalServerErrorException,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
@@ -14,7 +9,7 @@ import { SignUpUserDTO } from './dtos/sign-up-user.dto';
 import { SignInUserDTO } from './dtos/sign-in-user.dto';
 
 @Injectable()
-export class UsersService {
+export class UserService {
     constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
     async createUser(createUserDTO: SignUpUserDTO): Promise<User> {
@@ -45,18 +40,17 @@ export class UsersService {
 
     async validateUser(signInUserDTO: SignInUserDTO): Promise<User> {
         const { password, ...data } = signInUserDTO;
+
         const user = await this.userModel.findOne(data).select('+password');
 
-        if (!user || !(await compare(password, user.password))) {
+        if (!user && !(await compare(password, user.password))) {
             throw new UnauthorizedException('Invalid username or password');
         }
 
         return user;
     }
 
-    async getUser(userDataDTO: UserDataDTO): Promise<User> {
-        const user = await this.userModel.findOne(userDataDTO);
-
-        return user;
+    async getUserById(id: string): Promise<User> {
+        return await this.userModel.findById(id);
     }
 }

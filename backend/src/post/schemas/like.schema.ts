@@ -1,10 +1,7 @@
 import { Schema } from 'mongoose';
 
-export const NewsSchema = new Schema(
+export const LikeSchema = new Schema(
     {
-        text: String,
-        tags: [String],
-        imageUrl: String,
         author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
@@ -14,7 +11,6 @@ export const NewsSchema = new Schema(
     {
         timestamps: {
             createdAt: true,
-            updatedAt: true,
         },
         versionKey: false,
     },

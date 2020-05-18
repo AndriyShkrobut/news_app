@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
 
-export interface Post extends Document {
+export interface Comment extends Document {
+    readonly postId: string;
     readonly text: string;
     readonly tags: string[];
-    readonly imageUrl: string;
     readonly author: string;
     readonly createdAt: Date;
     readonly updatedAt: Date;
