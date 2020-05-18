@@ -7,4 +7,6 @@ export interface User extends Document {
     readonly email: string;
     readonly salt: string;
     readonly password: string;
+    followers: string[];
+    following: string[];
 }

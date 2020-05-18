@@ -85,7 +85,10 @@ export class PostController {
     ) {
         const { id: author } = user;
 
+        const postToCreateComment = await this._postService.getPostById(postId);
         const createdComment = await this._commentService.createComment({ ...createCommentDTO, author, postId });
+
+        await this._postService.addComment(postToCreateComment, createdComment);
 
         return res.status(HttpStatus.CREATED).json(createdComment);
     }
@@ -114,13 +117,17 @@ export class PostController {
     @Delete('/:postId/comments/:commentId')
     async deleteComment(
         @Res() res: Response,
+        @Param('postId', new ValidateObjectId()) postId: string,
         @Param('commentId', new ValidateObjectId()) commentId: string,
         @GetUser() user: User,
     ) {
         const { id: author } = user;
 
+        const postToDeleteComment = await this._postService.getPostById(postId);
         const deletedComment = await this._commentService.deleteComment(commentId, author);
 
-        return res.status(HttpStatus.OK).json(deletedComment);
+        const updatedPost = await this._postService.deleteComment(postToDeleteComment, deletedComment);
+
+        return res.status(HttpStatus.OK).json(updatedPost);
     }
 }

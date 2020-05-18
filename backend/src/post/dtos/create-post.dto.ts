@@ -1,19 +1,16 @@
-import { IsString, IsArray, IsDate, IsOptional } from 'class-validator';
+import { IsString, IsArray, IsOptional } from 'class-validator';
 
 export class CreatePostDTO {
+    @IsOptional()
     @IsString()
     readonly text: string;
+    @IsOptional()
     @IsArray()
     readonly tags?: string[];
+    @IsOptional()
     @IsString()
     readonly imagePath?: string;
     @IsOptional()
     @IsString()
     readonly author: string;
-    @IsOptional()
-    @IsDate()
-    readonly createdAt: Date;
-    @IsOptional()
-    @IsDate()
-    readonly updatedAt: Date;
 }

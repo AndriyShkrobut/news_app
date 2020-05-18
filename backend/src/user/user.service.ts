@@ -4,13 +4,12 @@ import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './interfaces/user.interface';
-import { UserDataDTO } from './dtos/user-data.dto';
 import { SignUpUserDTO } from './dtos/sign-up-user.dto';
 import { SignInUserDTO } from './dtos/sign-in-user.dto';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+    constructor(@InjectModel('User') private readonly _userModel: Model<User>) {}
 
     async createUser(createUserDTO: SignUpUserDTO): Promise<User> {
         const { password } = createUserDTO;
@@ -24,7 +23,7 @@ export class UserService {
             salt,
         };
 
-        const userToCreate = new this.userModel(userData);
+        const userToCreate = new this._userModel(userData);
 
         try {
             return await userToCreate.save();
@@ -41,7 +40,7 @@ export class UserService {
     async validateUser(signInUserDTO: SignInUserDTO): Promise<User> {
         const { password, ...data } = signInUserDTO;
 
-        const user = await this.userModel.findOne(data).select('+password');
+        const user = await this._userModel.findOne(data).select('+password');
 
         if (!user && !(await compare(password, user.password))) {
             throw new UnauthorizedException('Invalid username or password');
@@ -51,6 +50,36 @@ export class UserService {
     }
 
     async getUserById(id: string): Promise<User> {
-        return await this.userModel.findById(id);
+        return await this._userModel.findById(id);
+    }
+
+    async followUser(currentUser: User, userToFollow: User): Promise<User[]> {
+        if (currentUser.following.includes(userToFollow.id) && userToFollow.followers.includes(currentUser.id)) {
+            throw new ConflictException('You already follow this user');
+        }
+
+        try {
+            currentUser.following = [...currentUser.following, userToFollow.id];
+            userToFollow.followers = [...currentUser.followers, currentUser.id];
+
+            return await Promise.all([currentUser.save(), userToFollow.save()]);
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
+    }
+
+    async unfollowUser(currentUser: User, userToUnfollow: User): Promise<User[]> {
+        try {
+            currentUser.following = currentUser.following.filter(
+                userId => String(userId) !== String(userToUnfollow.id),
+            );
+            userToUnfollow.followers = userToUnfollow.followers.filter(
+                userId => String(userId) !== String(currentUser.id),
+            );
+
+            return await Promise.all([currentUser.save(), userToUnfollow.save()]);
+        } catch (error) {
+            throw new InternalServerErrorException(error.message);
+        }
     }
 }

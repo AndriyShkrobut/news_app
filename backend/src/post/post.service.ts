@@ -7,6 +7,7 @@ import { Comment } from './interfaces/comment.interface';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { ERROR_MESSAGES } from './shared/consts';
 import { CreateCommentDTO } from './dtos/create-comment.dto';
+import { User } from 'src/user/interfaces/user.interface';
 
 @Injectable()
 export class PostService {
@@ -19,7 +20,10 @@ export class PostService {
     }
 
     async getPostById(postId: string): Promise<Post> {
-        const post = await this._postModel.findById(postId).populate('author');
+        const post = await this._postModel
+            .findById(postId)
+            .populate('author')
+            .populate('comments');
 
         if (!post) {
             throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
@@ -76,5 +80,23 @@ export class PostService {
         }
 
         return postToDelete;
+    }
+
+    async addComment(post: Post, commentToCreate: Comment): Promise<Post> {
+        const postToComment = post.depopulate('comment');
+
+        postToComment.comments = [...postToComment.comments, commentToCreate.id];
+
+        return await postToComment.save();
+    }
+
+    async deleteComment(post: Post, commentToDelete: Comment): Promise<Post> {
+        const postToDeleteComment = post.depopulate('comment');
+
+        postToDeleteComment.comments = postToDeleteComment.comments.filter(
+            commentId => String(commentId) !== String(commentToDelete.id),
+        );
+
+        return await postToDeleteComment.save();
     }
 }
