@@ -1,13 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Post } from './interfaces/post.interface';
-import { Comment } from './interfaces/comment.interface';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { ERROR_MESSAGES } from './shared/consts';
-import { CreateCommentDTO } from './dtos/create-comment.dto';
-import { User } from 'src/user/interfaces/user.interface';
 
 @Injectable()
 export class PostService {
@@ -20,10 +17,7 @@ export class PostService {
     }
 
     async getPostById(postId: string): Promise<Post> {
-        const post = await this._postModel
-            .findById(postId)
-            .populate('author')
-            .populate('comments');
+        const post = await this._postModel.findById(postId).populate('author');
 
         if (!post) {
             throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);
@@ -82,21 +76,25 @@ export class PostService {
         return postToDelete;
     }
 
-    async addComment(post: Post, commentToCreate: Comment): Promise<Post> {
-        const postToComment = post.depopulate('comment');
+    async likePost(postToLike: Post, userId: string) {
+        const { likes } = postToLike;
 
-        postToComment.comments = [...postToComment.comments, commentToCreate.id];
+        if (likes.includes(userId)) {
+            throw new ConflictException('You already liked this post');
+        }
 
-        return await postToComment.save();
+        postToLike.likes = [...postToLike.likes, userId];
+
+        const likedPost = await postToLike.save();
+
+        return await likedPost.populate('likes').execPopulate();
     }
 
-    async deleteComment(post: Post, commentToDelete: Comment): Promise<Post> {
-        const postToDeleteComment = post.depopulate('comment');
+    async unlikePost(postToUnlike: Post, userId: string) {
+        postToUnlike.likes = postToUnlike.likes.filter(likeAuthor => String(likeAuthor) !== String(userId));
 
-        postToDeleteComment.comments = postToDeleteComment.comments.filter(
-            commentId => String(commentId) !== String(commentToDelete.id),
-        );
+        const unlikedPost = await postToUnlike.save();
 
-        return await postToDeleteComment.save();
+        return await unlikedPost.populate('likes').execPopulate();
     }
 }

@@ -12,10 +12,13 @@ import { AuthData } from './interfaces/auth-data.interface';
 export class AuthService {
     constructor(private readonly _userService: UserService, private readonly _tokenService: TokenService) {}
 
-    async signUp(signUpUserDTO: SignUpUserDTO): Promise<User> {
-        const userToCreate = await this._userService.createUser(signUpUserDTO);
+    async signUp(signUpUserDTO: SignUpUserDTO, userAgent: string): Promise<AuthData> {
+        const { username, id } = await this._userService.createUser(signUpUserDTO);
 
-        return userToCreate;
+        const accessToken = await this._tokenService.generateAccessToken({ id, username });
+        const refreshToken = await this._tokenService.generateRefreshToken({ id, userAgent });
+
+        return { accessToken, refreshToken };
     }
 
     async signIn(signInUserDTO: SignInUserDTO, userAgent: string): Promise<AuthData> {

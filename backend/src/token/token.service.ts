@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as jwt from 'jsonwebtoken';
 
-import { Token } from './interfaces/token.interface';
+import { RefreshToken } from './interfaces/token.interface';
 import { SaveTokenDTO } from './dtos/save-token.dto';
 import { RefreshTokenDTO } from './dtos/refresh-token.dto';
 import { JwtRefreshPayload, JwtAccessPayload } from 'src/token/interfaces/jwt-payload.interface';
@@ -12,17 +12,17 @@ import { JwtRefreshPayload, JwtAccessPayload } from 'src/token/interfaces/jwt-pa
 @Injectable()
 export class TokenService {
     constructor(
-        @InjectModel('Token') private readonly _tokenModel: Model<Token>,
+        @InjectModel('Token') private readonly _tokenModel: Model<RefreshToken>,
         private readonly _jwtService: JwtService,
     ) {}
 
-    async saveToken(createTokenDTO: SaveTokenDTO): Promise<Token> {
+    async saveToken(createTokenDTO: SaveTokenDTO): Promise<RefreshToken> {
         const tokenToCreate = new this._tokenModel(createTokenDTO);
 
         return await tokenToCreate.save();
     }
 
-    async deleteToken(userId: string, userAgent: string): Promise<Token> {
+    async deleteToken(userId: string, userAgent: string): Promise<RefreshToken> {
         const tokenToDelete = await this._tokenModel.findOneAndDelete({
             userId,
             userAgent,

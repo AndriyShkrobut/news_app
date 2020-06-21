@@ -14,10 +14,11 @@ export class AuthController {
     constructor(private readonly _authService: AuthService) {}
 
     @Post('/signup')
-    async signUp(@Res() res: Response, @Body() signUpUserDTO: SignUpUserDTO) {
-        const createdUser = await this._authService.signUp(signUpUserDTO);
+    async signUp(@Req() req: Request, @Res() res: Response, @Body() signUpUserDTO: SignUpUserDTO) {
+        const userAgent = req.get('user-agent');
+        const authData = await this._authService.signUp(signUpUserDTO, userAgent);
 
-        return res.status(HttpStatus.CREATED).json(createdUser);
+        return res.status(HttpStatus.CREATED).json(authData);
     }
 
     @Post('/signin')

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -51,5 +51,15 @@ export class CommentService {
         }
 
         return commentToDelete;
+    }
+
+    async deleteCommentsByPostId(postId: string): Promise<boolean> {
+        const status = await this._commentModel.deleteMany({ postId });
+
+        if (!status.ok) {
+            throw new InternalServerErrorException('Cant delete comment');
+        }
+
+        return true;
     }
 }

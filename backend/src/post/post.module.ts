@@ -6,7 +6,6 @@ import { PostService } from './post.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { PostSchema } from './schemas/post.schema';
 import { CommentSchema } from './schemas/comment.schema';
-import { LikeSchema } from './schemas/like.schema';
 import { CommentService } from './comment.service';
 
 @Module({
@@ -15,7 +14,6 @@ import { CommentService } from './comment.service';
         MongooseModule.forFeature([
             { name: 'Post', schema: PostSchema },
             { name: 'Comment', schema: CommentSchema },
-            { name: 'Like', schema: LikeSchema },
         ]),
     ],
     controllers: [PostController],

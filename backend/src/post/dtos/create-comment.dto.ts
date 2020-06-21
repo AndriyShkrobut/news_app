@@ -1,15 +1,15 @@
-import { IsString, IsArray, IsDate, IsOptional } from 'class-validator';
+import { IsString, IsArray, IsOptional } from 'class-validator';
 
 export class CreateCommentDTO {
     @IsOptional()
     @IsString()
-    readonly postId: string;
+    postId: string;
     @IsString()
-    readonly text: string;
+    text: string;
     @IsOptional()
     @IsArray()
-    readonly tags?: string[];
+    tags?: string[];
     @IsOptional()
     @IsString()
-    readonly author: string;
+    author: string;
 }

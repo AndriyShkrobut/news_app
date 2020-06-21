@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Post, Body, Res, Param, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, UseGuards, Post, Res, Param, HttpStatus, NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/shared/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 import { GetUser } from 'src/auth/shared/decorators/get-user.decorator';

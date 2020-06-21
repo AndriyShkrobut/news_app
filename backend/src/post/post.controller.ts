@@ -44,7 +44,7 @@ export class PostController {
         @Param('userId', new ValidateObjectId()) userId: string,
         @Query('sort') sortQuery?: string,
     ) {
-        const posts = await this._postService.getPostsByUserId(userId);
+        const posts = await this._postService.getPostsByUserId(userId, sortQuery);
 
         return res.status(HttpStatus.OK).json(posts);
     }
@@ -71,6 +71,8 @@ export class PostController {
     ) {
         const { id: author } = user;
 
+        await this._commentService.deleteCommentsByPostId(postId);
+
         const deletedPost = await this._postService.deletePost(postId, author);
 
         return res.status(HttpStatus.OK).json(deletedPost);
@@ -85,10 +87,7 @@ export class PostController {
     ) {
         const { id: author } = user;
 
-        const postToCreateComment = await this._postService.getPostById(postId);
         const createdComment = await this._commentService.createComment({ ...createCommentDTO, author, postId });
-
-        await this._postService.addComment(postToCreateComment, createdComment);
 
         return res.status(HttpStatus.CREATED).json(createdComment);
     }
@@ -123,11 +122,36 @@ export class PostController {
     ) {
         const { id: author } = user;
 
-        const postToDeleteComment = await this._postService.getPostById(postId);
         const deletedComment = await this._commentService.deleteComment(commentId, author);
 
-        const updatedPost = await this._postService.deleteComment(postToDeleteComment, deletedComment);
+        return res.status(HttpStatus.OK).json(deletedComment);
+    }
 
-        return res.status(HttpStatus.OK).json(updatedPost);
+    @Post('/:postId/like')
+    async likePost(
+        @Res() res: Response,
+        @Param('postId', new ValidateObjectId()) postId: string,
+        @GetUser() user: User,
+    ) {
+        const { id: userId } = user;
+
+        const postToLike = await this._postService.getPostById(postId);
+        const likedPost = await this._postService.likePost(postToLike, userId);
+
+        return res.status(HttpStatus.OK).json(likedPost);
+    }
+
+    @Post('/:postId/unlike')
+    async unlikePost(
+        @Res() res: Response,
+        @Param('postId', new ValidateObjectId()) postId: string,
+        @GetUser() user: User,
+    ) {
+        const { id: userId } = user;
+
+        const postToUnlike = await this._postService.getPostById(postId);
+        const unlikedPost = await this._postService.unlikePost(postToUnlike, userId);
+
+        return res.status(HttpStatus.OK).json(unlikedPost);
     }
 }
