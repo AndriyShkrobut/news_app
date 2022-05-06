@@ -1,36 +1,22 @@
-import React from 'react';
-import Button from 'components/Button';
-import { useAuth } from 'hooks/useAuth';
+import React, { useEffect, useState } from 'react';
 import { useRequest } from 'hooks/useRequest';
-import { HttpMethod } from 'consts';
+import { PostList } from 'components/PostList';
 
 const HomePage = () => {
-    const { isSignedIn, signOut } = useAuth();
     const { request } = useRequest();
+    const [posts, setPosts] = useState([]);
 
-    const getPosts = async () => {
-        const response = await request('/posts?sort=-createdAt');
-        console.log(response);
-    };
+    useEffect(() => {
+        const getPosts = async () => {
+            const response = await request('/posts?sort=-createdAt');
 
-    const onClick = async () => {
-        const response = await request('/auth/signout', HttpMethod.POST);
+            if (response) setPosts(response);
+        };
 
-        if (response) {
-            signOut();
-        }
-    };
+        getPosts();
+    }, [request]);
 
-    return (
-        <>
-            <Button disabled={!isSignedIn} onClick={onClick}>
-                Sign Out
-            </Button>
-            <Button disabled={!isSignedIn} onClick={getPosts}>
-                Get Posts
-            </Button>
-        </>
-    );
+    return <PostList posts={posts} />;
 };
 
 export default HomePage;

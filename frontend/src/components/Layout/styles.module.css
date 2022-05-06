@@ -1,0 +1,13 @@
+.layout {
+    height: 100vh;
+    padding: 100px;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+}
+
+.main {
+    height: 100%;
+    display: grid;
+    grid-row: 2;
+    grid-column: 2;
+}

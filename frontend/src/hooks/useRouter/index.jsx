@@ -11,6 +11,7 @@ export const useRouter = () => {
         () => ({
             push: history.push,
             replace: history.replace,
+            goBack: history.goBack,
             pathName: location.pathname,
             query: {
                 ...params,

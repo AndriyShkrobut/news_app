@@ -1,12 +1,21 @@
 .button {
-    font-size: var(--font-small);
-    width: 175px;
-    height: 50px;
-    border: none;
+    font-size: var(--font-smaller);
+    height: calc(3em + 2px);
+    padding: 1em;
     border-radius: 100px;
+    transition: var(--transition-fast) var(--transition-linear);
+}
+
+.button__primary {
+    border: none;
     color: var(--white);
     background-color: var(--primary);
-    transition: background-color var(--transition-fast) var(--transition-linear);
+}
+
+.button__secondary {
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background-color: var(--white);
 }
 
 .button:disabled {
@@ -17,4 +26,12 @@
 .button:not(:disabled):hover {
     cursor: pointer;
     background-color: var(--secondary);
+}
+
+.button:not(:disabled):focus {
+    box-shadow: 1px 1px 10px var(--grey);
+}
+
+.button__secondary:not(:disabled):hover {
+    color: var(--white);
 }

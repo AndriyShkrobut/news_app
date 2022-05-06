@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 
 import * as serviceWorker from './serviceWorker';
 import Root from 'components/Root';
+import 'normalize.css';
 import './index.css';
 
 const root = document.getElementById('root');

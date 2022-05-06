@@ -13,11 +13,13 @@ export class CommentService {
     async createComment(createCommentDTO: CreateCommentDTO): Promise<Comment> {
         const commentToCreate = new this._commentModel(createCommentDTO);
 
-        return await commentToCreate.save();
+        const createdComment = await commentToCreate.populate('author').save();
+
+        return await this._commentModel.populate(createdComment, { path: 'author' });
     }
 
     async getCommentsByPostId(postId: string): Promise<Comment[]> {
-        const comments = await this._commentModel.find({ postId });
+        const comments = await this._commentModel.find({ postId }).populate('author');
 
         if (!comments) {
             throw new NotFoundException(ERROR_MESSAGES.NOT_FOUND);

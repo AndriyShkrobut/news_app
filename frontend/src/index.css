@@ -1,16 +1,19 @@
 html {
+    height: 100%;
     font-size: 16px;
 }
 
 body {
+    height: 100%;
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 1.6rem;
     line-height: 1.625;
 }
 
 :root {
-    --primary: #4dd8ff;
-    --secondary: #3ba2c0;
+    --primary: #00b6e8;
+    --secondary: #0098c2;
+    --black: #000000;
     --white: #ffffff;
     --grey: #a9abaa;
 
@@ -25,8 +28,32 @@ body {
     --font-bigger: 6.854rem;
 }
 
+a,
+a:visited {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--transition-fast) var(--transition-linear);
+}
+
+a:hover {
+    color: var(--primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+}
+
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+*:focus {
+    outline: none;
 }

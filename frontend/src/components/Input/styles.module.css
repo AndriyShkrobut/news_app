@@ -1,0 +1,32 @@
+.input__block {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.input {
+    font-size: var(--font-smaller);
+    margin: 0 0 2em;
+    padding: 1em;
+    width: 100%;
+    border: 1px solid var(--grey);
+    border-radius: 1.5em;
+    background: var(--white);
+    transition: var(--transition-fast) var(--transition-linear);
+    resize: none;
+    outline: none;
+}
+
+.input:focus {
+    box-shadow: 0px 0px 10px var(--grey);
+    border-color: transparent;
+}
+
+.input:focus + .label {
+    color: var(--primary);
+}
+
+.label {
+    padding: 0 0 1em 1.3em;
+    font-size: var(--font-smaller);
+    color: var(--grey);
+}

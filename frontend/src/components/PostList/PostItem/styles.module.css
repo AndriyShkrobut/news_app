@@ -1,0 +1,8 @@
+.post__block {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    box-shadow: 1px 1px 15px var(--grey);
+    margin: 25px 0;
+}

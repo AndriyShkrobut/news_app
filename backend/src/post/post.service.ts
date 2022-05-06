@@ -75,26 +75,4 @@ export class PostService {
 
         return postToDelete;
     }
-
-    async likePost(postToLike: Post, userId: string) {
-        const { likes } = postToLike;
-
-        if (likes.includes(userId)) {
-            throw new ConflictException('You already liked this post');
-        }
-
-        postToLike.likes = [...postToLike.likes, userId];
-
-        const likedPost = await postToLike.save();
-
-        return await likedPost.populate('likes').execPopulate();
-    }
-
-    async unlikePost(postToUnlike: Post, userId: string) {
-        postToUnlike.likes = postToUnlike.likes.filter(likeAuthor => String(likeAuthor) !== String(userId));
-
-        const unlikedPost = await postToUnlike.save();
-
-        return await unlikedPost.populate('likes').execPopulate();
-    }
 }

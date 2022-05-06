@@ -11,12 +11,12 @@ import { CreateCommentDTO } from './dtos/create-comment.dto';
 import { CommentService } from './comment.service';
 
 @Controller('posts')
-@UseGuards(JwtAuthGuard)
+// @UseGuards(JwtAuthGuard)
 export class PostController {
     constructor(private readonly _postService: PostService, private readonly _commentService: CommentService) {}
 
     @Post('/')
-    async createPost(@Res() res: Response, @Body() createPostDTO: CreatePostDTO, @GetUser() user: User) {
+    async createPost(@Res() res: Response, @Body() createPostDTO: CreatePostDTO, @GetUser() user: User) {  
         const { id: author } = user;
 
         const createdPost = await this._postService.createPost({ ...createPostDTO, author });
@@ -125,33 +125,5 @@ export class PostController {
         const deletedComment = await this._commentService.deleteComment(commentId, author);
 
         return res.status(HttpStatus.OK).json(deletedComment);
-    }
-
-    @Post('/:postId/like')
-    async likePost(
-        @Res() res: Response,
-        @Param('postId', new ValidateObjectId()) postId: string,
-        @GetUser() user: User,
-    ) {
-        const { id: userId } = user;
-
-        const postToLike = await this._postService.getPostById(postId);
-        const likedPost = await this._postService.likePost(postToLike, userId);
-
-        return res.status(HttpStatus.OK).json(likedPost);
-    }
-
-    @Post('/:postId/unlike')
-    async unlikePost(
-        @Res() res: Response,
-        @Param('postId', new ValidateObjectId()) postId: string,
-        @GetUser() user: User,
-    ) {
-        const { id: userId } = user;
-
-        const postToUnlike = await this._postService.getPostById(postId);
-        const unlikedPost = await this._postService.unlikePost(postToUnlike, userId);
-
-        return res.status(HttpStatus.OK).json(unlikedPost);
     }
 }
